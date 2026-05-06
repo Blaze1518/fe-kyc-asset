@@ -2,6 +2,8 @@ import type { AxiosInstance } from "axios";
 import { normalizeAxiosError } from "./axios.error";
 import { axiosInstance } from "./axios.instance";
 
+export const TOKEN_EXPIRED_CODE = "AUTH_001";
+
 export function attachInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use(
     (config) => {
@@ -10,38 +12,39 @@ export function attachInterceptors(instance: AxiosInstance) {
     },
     (error) => {
       return Promise.reject(error);
-    }
+    },
   );
 
   instance.interceptors.response.use(
     (response) => response,
     async (error) => {
+      const httpError = normalizeAxiosError(error);
       const originalRequest = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      const errorCode = (httpError.data as any)?.errorCode;
+
+      const resData = error.response?.data;
+
+      if (
+        httpError.status === 401 &&
+        errorCode === "TOKEN_EXPIRED" &&
+        !originalRequest._retry
+      ) {
         originalRequest._retry = true;
         try {
           await axiosInstance.post("/auth/refresh-token");
           return instance(originalRequest);
         } catch (refreshError) {
           window.location.href = "/sign-in";
-          return Promise.reject(refreshError);
+          return Promise.reject(normalizeAxiosError(refreshError));
         }
       }
 
-      if (error.response?.status === 403) {
-        const resData = error.response.data;
-
-        if (resData?.error?.errorCode === "ERROR_IP_NOT_ALLOWED") {
-          if (!window.location.pathname.includes("/blocked-ip")) {
-            window.location.href = "/blocked-ip";
-          }
-
-          return Promise.reject(normalizeAxiosError(error));
-        }
+      if (httpError.status === 403 && errorCode === "ERROR_IP_NOT_ALLOWED") {
+        window.location.href = "/blocked-ip";
       }
 
-      return Promise.reject(normalizeAxiosError(error));
-    }
+      return Promise.reject(httpError);
+    },
   );
 }

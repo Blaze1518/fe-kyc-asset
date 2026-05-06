@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 // import { pingIp } from "@/services/security/ip-ping";
 import { usePathname } from "next/navigation";
 import { queryClient } from "@/shared/query/query-client";
+import Template from "./template";
 export default function AppProvider({
   children,
 }: {
@@ -20,7 +21,7 @@ export default function AppProvider({
   return (
     <QueryClientProvider client={queryClient}>
       <Toaster position="top-right" richColors />
-      {children}
+      <Template>{children}</Template>
     </QueryClientProvider>
   );
 }

@@ -13,7 +13,7 @@ export async function signInApi(payload: SignInPayload): Promise<SignInResult> {
 }
 
 export async function getAuthUserApi(): Promise<AuthUserResponse> {
-  const { data } = await axiosInstance.get<AuthUserResponse>("/users/me");
+  const { data } = await axiosInstance.get<AuthUserResponse>("/auth/me");
   return data;
 }
 

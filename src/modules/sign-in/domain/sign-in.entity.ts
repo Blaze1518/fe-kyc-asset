@@ -1,7 +1,16 @@
 import type { Role } from "@/modules/roles/domain/role.entity";
+export type AuthRuleAction = "manage" | "create" | "read" | "update" | "delete";
 
-type AuthResponse<T> = {
-  statusCode: number;
+export type AuthRuleCondition = Record<string, unknown>;
+
+export interface AuthRule {
+  action: AuthRuleAction;
+  subject: string;
+  conditions?: AuthRuleCondition;
+}
+
+type ApiResponse<T> = {
+  success: boolean;
   message: string;
   data: T;
 };
@@ -17,13 +26,13 @@ export type SignInResult = {
 
 export interface AuthUser {
   id: string;
-  username: string;
+  displayName: string;
   email: string;
-  roles: Role[];
-  permissions: string[];
+  roles: string[];
+  rules: AuthRule[];
 }
 
-export interface AuthUserResponse extends AuthResponse<AuthUser> {}
+export interface AuthUserResponse extends ApiResponse<AuthUser> {}
 
 export interface LogoutResult {
   statusCode: number;

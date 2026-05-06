@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const AUTH_SIGN_IN_PATH = "/sign-in";
+const AUTH_SIGN_IN_PATH = "/";
 const DASHBOARD_ROOT_PATH = "/dashboard";
 
 function isAuthRoute(pathname: string): boolean {

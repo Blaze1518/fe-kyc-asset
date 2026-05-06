@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Sacramento } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import AppProvider from "./provider";
+import { PageOrchestrator } from "@/shared/ui/page-orchestrator";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -36,9 +37,11 @@ export default function RootLayout({
       >
         <ThemeProvider defaultTheme="system" storageKey="nextjs-ui-theme">
           <AppProvider>
+            {/* <PageOrchestrator> */}
             <div className="block-preview-wrapper min-h-screen not-dark:bg-neutral-50/50">
               {children}
             </div>
+            {/* </PageOrchestrator> */}
           </AppProvider>
         </ThemeProvider>
       </body>

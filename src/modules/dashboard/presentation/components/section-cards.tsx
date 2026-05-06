@@ -22,7 +22,16 @@ import { Pie, PieChart, Cell } from "recharts";
 import { useDeviceStatusSummary } from "../hooks/use-permissions";
 import { Badge } from "@/shared/ui/badge";
 export function SectionCards() {
-  const { data, isLoading, isError } = useDeviceStatusSummary();
+  const { data, isLoading, isError } = {
+    data: {
+      data: {
+        totalOnline: 10,
+        totalOffline: 10,
+      },
+    },
+    isLoading: false,
+    isError: false,
+  };
 
   const summary = data?.data;
   const totalOnline = summary?.totalOnline ?? 0;
@@ -34,7 +43,7 @@ export function SectionCards() {
       online: { label: "Online", color: "#22c55e" }, // green
       offline: { label: "Offline", color: "#ef4444" }, // red
     }),
-    []
+    [],
   );
 
   const chartData = React.useMemo(
@@ -52,7 +61,7 @@ export function SectionCards() {
         fill: "var(--color-offline)",
       },
     ],
-    [totalOnline, totalOffline]
+    [totalOnline, totalOffline],
   );
 
   return (

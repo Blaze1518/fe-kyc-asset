@@ -1,5 +1,6 @@
+"use client";
 import { SectionCards } from "@/modules/dashboard/presentation/components/section-cards";
-
+import { TransitionBox } from "@/shared/ui/box-transition";
 export default function Page() {
   return (
     <>

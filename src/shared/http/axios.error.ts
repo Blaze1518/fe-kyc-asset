@@ -1,41 +1,29 @@
 // axios.error.ts
-import { AxiosError } from "axios";
+import axios from "axios";
 import type { ApiErrorBody, ApiResponse } from "./axios.types";
 
 export class HttpError extends Error {
   constructor(
     public status: number,
     public code: string,
-    public data: ApiErrorBody | unknown | null
+    public data: ApiErrorBody | unknown | null,
   ) {
     super(code);
   }
 }
 
 export function normalizeAxiosError(error: unknown): HttpError {
-  if (error instanceof AxiosError) {
-    const status = error.response?.status ?? 0;
-    const code = error.code ?? "AXIOS_ERROR";
+  if (axios.isAxiosError(error)) {
+    const status = error.response?.status ?? 500;
+    const data = error.response?.data;
 
-    const rawData = error.response?.data as
-      | ApiResponse<unknown>
-      | ApiErrorBody
-      | undefined;
+    const errorBody = data?.error ?? {
+      message: data?.message || "Có lỗi xảy ra",
+      errorCode: "UNKNOWN_ERROR",
+    };
 
-    let errorData: ApiErrorBody | unknown | null = null;
-
-    if (rawData && typeof rawData === "object" && "error" in rawData) {
-      const envelope = rawData as ApiResponse<unknown>;
-      errorData = envelope.error;
-    } else {
-      errorData = rawData ?? null;
-    }
-
-    return new HttpError(status, code, errorData);
+    return new HttpError(status, errorBody.errorCode, errorBody);
   }
 
-  const fallbackError =
-    error instanceof Error ? error.message : "An unknown error occurred";
-
-  return new HttpError(500, "INTERNAL_SERVER_ERROR", fallbackError);
+  return new HttpError(500, "INTERNAL_SERVER_ERROR", "Lỗi không xác định");
 }

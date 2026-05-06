@@ -21,17 +21,12 @@ export const MUTATION_CACHE = new MutationCache({
     }
   },
   onError: (error, _vars, _ctx, mutation) => {
-    const meta = mutation.meta;
-    // if (!meta?.ignoreAuth) {
-    //   const isUnauth = error instanceof HttpError && error.status === 401;
-    // }
-
-    let message = getErrorMessage(error);
-
-    if (typeof meta?.errorMessage === "string") {
-      message = meta.errorMessage;
+    if (typeof mutation.meta?.errorMessage === "string") {
+      toast.error(mutation.meta.errorMessage);
+      return;
     }
 
+    const message = getErrorMessage(error);
     toast.error(message);
   },
 });

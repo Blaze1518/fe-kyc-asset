@@ -6,18 +6,22 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/shared/ui/button";
 import { Field, FieldError, FieldLabel } from "@/shared/ui/field";
+import { LoaderCircle, LogIn } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { Separator } from "@/shared/ui/separator";
 import { useSignIn } from "@/modules/sign-in/presentation/hooks/use-sign-in";
 import { SignInPayload } from "@/modules/sign-in/domain/sign-in.entity";
-
+import { useRouter } from "next/navigation";
+import { useTransitionStore } from "@/store/use-transition-store";
 const formSchema = z.object({
   username: z.string().min(1, "Tên đăng nhập là bắt buộc"),
   password: z.string().min(1, "Mật khẩu là bắt buộc"),
 });
 
 const Login = () => {
+  const router = useRouter();
   const { mutate: signIn, isPending } = useSignIn();
+  const stageExit = useTransitionStore((s) => s.stageExit);
 
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -32,7 +36,11 @@ const Login = () => {
       username: data.username,
       password: data.password,
     };
-    signIn(payload);
+    signIn(payload, {
+      onSuccess: () => {
+        stageExit("/dashboard", { duration: 0.3 });
+      },
+    });
   };
 
   return (
@@ -41,8 +49,8 @@ const Login = () => {
         <div className="m-auto flex w-full max-w-xs flex-col items-center">
           <p className="mt-4 font-sacramento text-3xl">KYC Assets for Attpay</p>
           <div className="my-4 flex w-full items-center justify-center overflow-hidden">
-            <Separator />
-            <Separator />
+            {/* <Separator />
+            <Separator /> */}
           </div>
           <form
             className="w-full space-y-4"
@@ -83,7 +91,14 @@ const Login = () => {
               )}
             />
             <Button className="mt-4 w-full" type="submit" disabled={isPending}>
-              {isPending ? "Đang đăng nhập..." : "Đăng nhập"}
+              {isPending ? (
+                <LoaderCircle className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <LogIn className="h-4 w-4" />
+                  <span>Đăng nhập</span>
+                </>
+              )}
             </Button>
           </form>
         </div>

@@ -32,12 +32,16 @@ import { useAuth } from "@/hooks/use-auth";
 import type { AuthUser } from "@/modules/sign-in/domain/sign-in.entity";
 import { PERMISSIONS } from "@/types/auth";
 import type { LucideIcon } from "lucide-react";
+import { useAbility } from "@/casl/hooks";
 
 type NavItemConfig = {
   title: string;
   url: string;
   icon?: LucideIcon;
-  requiredPermissions?: string[];
+  can?: {
+    action: string;
+    subject: string;
+  };
   items?: NavItemConfig[];
 };
 
@@ -51,87 +55,90 @@ const NAV_GROUPS: NavGroupConfig[] = [
     label: "Tổng quan",
     items: [
       {
-        title: "Tổng quan",
+        title: "Biểu đồ",
         url: "/dashboard",
         icon: LayoutDashboard,
       },
     ],
   },
+
   {
-    label: "Ứng dụng",
+    label: "Quản lý hệ thống",
     items: [
       {
-        title: "Danh sách điểm danh",
-        url: "/dashboard/attendance-records",
-        icon: CheckSquare,
-        requiredPermissions: [PERMISSIONS.RECORDS.actions.READ_LIST],
-      },
-    ],
-  },
-  {
-    label: "Quản lý",
-    items: [
-      {
-        title: "Quản lý IP",
-        url: "/dashboard/ip-management",
+        title: "Phòng ban",
+        url: "/dashboard/departments",
         icon: Shield,
-        requiredPermissions: [PERMISSIONS.WHITELIST_IP.actions.READ],
-      },
-      {
-        title: "Quản lý thiết bị",
-        url: "/dashboard/devices",
-        icon: Smartphone,
-        requiredPermissions: [PERMISSIONS.DEVICES.actions.READ_LIST],
+        can: { action: "read", subject: "Department" },
         items: [
           {
-            title: "Danh sách thiết bị",
-            url: "/dashboard/devices",
-            icon: Smartphone,
-            requiredPermissions: [PERMISSIONS.DEVICES.actions.READ_LIST],
+            title: "Danh sách phòng ban",
+            url: "/dashboard/departments",
+            can: { action: "read", subject: "Department" },
           },
           {
-            title: "Cập nhật thiết bị",
-            url: "/dashboard/devices/update",
-            icon: LayoutDashboard,
-            requiredPermissions: [PERMISSIONS.DEVICES.actions.UPDATE],
+            title: "Tạo phòng ban",
+            url: "/dashboard/departments/create",
+            can: { action: "create", subject: "Department" },
           },
         ],
       },
+
       {
-        title: "Quản lý người dùng",
+        title: "Cổng (Port)",
+        url: "/dashboard/ports",
+        icon: Smartphone,
+        can: { action: "read", subject: "Port" },
+        items: [
+          {
+            title: "Danh sách port",
+            url: "/dashboard/ports",
+            can: { action: "read", subject: "Port" },
+          },
+          {
+            title: "Tạo port",
+            url: "/dashboard/ports/create",
+            can: { action: "create", subject: "Port" },
+          },
+        ],
+      },
+
+      {
+        title: "File",
+        url: "/dashboard/files",
+        icon: Book,
+        can: { action: "read", subject: "File" },
+      },
+
+      {
+        title: "Whitelist IP",
+        url: "/dashboard/ip",
+        icon: Shield,
+        can: { action: "read", subject: "IPWhitelist" },
+      },
+    ],
+  },
+
+  {
+    label: "Người dùng",
+    items: [
+      {
+        title: "Users",
         url: "/dashboard/users",
         icon: Users,
-        requiredPermissions: [PERMISSIONS.USERS.actions.READ_LIST],
-        items: [
-          {
-            title: "Danh sách người dùng",
-            url: "/dashboard/users",
-            icon: Users,
-            requiredPermissions: [PERMISSIONS.USERS.actions.READ_LIST],
-          },
-          {
-            title: "Quản lý vai trò",
-            url: "/dashboard/roles",
-            icon: UserPlus,
-            requiredPermissions: [PERMISSIONS.ROLES.actions.READ],
-          },
-          {
-            title: "Quản lý quyền",
-            url: "/dashboard/permissions",
-            icon: UserCog,
-            requiredPermissions: [PERMISSIONS.PERMISSIONS.actions.READ],
-          },
-        ],
+        can: { action: "read", subject: "User" },
       },
-    ],
-  },
-  {
-    label: "Tài liệu",
-    items: [
       {
-        title: "Tài liệu sử dụng",
-        url: "https://attcloud.gitbook.io/att-attendance",
-        icon: Book,
+        title: "Roles",
+        url: "/dashboard/roles",
+        icon: UserPlus,
+        can: { action: "read", subject: "Role" },
+      },
+      {
+        title: "Permissions",
+        url: "/dashboard/permissions",
+        icon: UserCog,
+        can: { action: "read", subject: "Permission" },
       },
     ],
   },
@@ -140,14 +147,14 @@ const NAV_GROUPS: NavGroupConfig[] = [
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION ?? "1.0.0";
   const { state } = useSidebar();
-  const { user, hasPermission } = useAuth();
+  const ability = useAbility();
   const isCollapsed = state === "collapsed";
 
   const filterNavItems = (items: NavItemConfig[]): NavItemConfig[] => {
     return items
       .filter((item) => {
-        if (!item.requiredPermissions) return true;
-        return hasPermission(item.requiredPermissions);
+        if (!item.can) return true;
+        return ability.can(item.can.action as any, item.can.subject as any);
       })
       .map((item) => ({
         ...item,
@@ -159,14 +166,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return NAV_GROUPS.map((group) => ({
       ...group,
       items: filterNavItems(group.items),
-    })).filter((group) => group.items.length > 0);
-  }, [user]);
+    })).filter((g) => g.items.length > 0);
+  }, [ability]);
 
-  const displayUser = {
-    name: user?.username ?? "Admin",
-    email: user?.roles?.[0]?.name ?? "Người dùng",
-    avatar: "",
-  };
+  // const displayUser = {
+  //   name: user?.username ?? "Admin",
+  //   email: user?.roles?.[0]?.name ?? "Người dùng",
+  //   avatar: "",
+  // };
 
   return (
     <Sidebar {...props}>
@@ -178,16 +185,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="flex items-center justify-between w-full gap-2">
                   <div className="flex items-center gap-2">
                     {isCollapsed ? (
-                      <Logo size={28} />
+                      <p className="font-sacramento text-[10px] font-bold">
+                        KYC
+                      </p>
                     ) : (
-                      <Image
-                        src="/logo/logo-full.png"
-                        alt="SCheck"
-                        width={256}
-                        height={123}
-                        className="h-8 w-auto"
-                        priority
-                      />
+                      <p className="mt-4 font-sacramento text-2xl font-medium">
+                        KYC Assets
+                      </p>
                     )}
                   </div>
                   {!isCollapsed && (
@@ -209,9 +213,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <NavMain key={group.label} label={group.label} items={group.items} />
         ))}
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={displayUser} />
-      </SidebarFooter>
+      <SidebarFooter>{/* <NavUser user={displayUser} /> */}</SidebarFooter>
     </Sidebar>
   );
 }

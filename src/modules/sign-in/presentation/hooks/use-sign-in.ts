@@ -24,12 +24,8 @@ type UseSignInOptions = {
 
 export function useSignIn(options?: UseSignInOptions) {
   const { mutationConfig } = options ?? {};
-  const router = useRouter();
   return useMutation<SignInResult, HttpError, SignInPayload>({
     mutationFn: signInUseCase,
-    onSuccess: (data: SignInResult) => {
-      router.push("/dashboard");
-    },
     meta: {
       successMessage: "Đăng nhập thành công",
       ...mutationConfig?.meta,
