@@ -55,7 +55,7 @@ const NAV_GROUPS: NavGroupConfig[] = [
     label: "Tổng quan",
     items: [
       {
-        title: "Biểu đồ",
+        title: "Dashboard",
         url: "/dashboard",
         icon: LayoutDashboard,
       },
@@ -63,7 +63,7 @@ const NAV_GROUPS: NavGroupConfig[] = [
   },
 
   {
-    label: "Quản lý hệ thống",
+    label: "Quản lý tài nguyên",
     items: [
       {
         title: "Phòng ban",
@@ -85,7 +85,7 @@ const NAV_GROUPS: NavGroupConfig[] = [
       },
 
       {
-        title: "Cổng (Port)",
+        title: "Port",
         url: "/dashboard/ports",
         icon: Smartphone,
         can: { action: "read", subject: "Port" },
@@ -103,13 +103,25 @@ const NAV_GROUPS: NavGroupConfig[] = [
         ],
       },
 
+      // 🔥 QUAN TRỌNG: thay File bằng Explorer
       {
-        title: "File",
-        url: "/dashboard/files",
+        title: "Duyệt file",
+        url: "/dashboard/explorer",
         icon: Book,
         can: { action: "read", subject: "File" },
       },
+    ],
+  },
 
+  {
+    label: "Hệ thống",
+    items: [
+      {
+        title: "Log truy cập",
+        url: "/dashboard/logs",
+        icon: CheckSquare,
+        can: { action: "read", subject: "Log" },
+      },
       {
         title: "Whitelist IP",
         url: "/dashboard/ip",

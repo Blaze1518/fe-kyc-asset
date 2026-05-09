@@ -22,7 +22,6 @@ const Login = () => {
   const router = useRouter();
   const { mutate: signIn, isPending } = useSignIn();
   const stageExit = useTransitionStore((s) => s.stageExit);
-
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       username: "",

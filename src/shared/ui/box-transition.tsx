@@ -51,11 +51,11 @@ const variants = {
   },
 };
 
-export const TransitionBox = ({
+export default function TransitionBox({
   children,
   variant = "fade",
   ...props
-}: TransitionBoxProps) => {
+}: TransitionBoxProps) {
   const isExiting = useTransitionStore((s) => s.isExiting);
   const config = useTransitionStore((s) => s.config);
 
@@ -75,4 +75,4 @@ export const TransitionBox = ({
       </AnimatePresence>
     </div>
   );
-};
+}

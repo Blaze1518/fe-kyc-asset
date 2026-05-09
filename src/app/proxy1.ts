@@ -14,9 +14,14 @@ function isProtectedRoute(pathname: string): boolean {
     pathname.startsWith("/attendance-records")
   );
 }
-export function proxy(request: NextRequest) {
-  const token = request.cookies.get("access_token")?.value;
-  const { pathname, origin } = request.nextUrl;
+
+export function proxy1(req: NextRequest) {
+  console.error("[proxy] function loaded");
+  const token = req.cookies.get("access_token")?.value;
+  const { pathname, origin } = req.nextUrl;
+
+  console.log("Cookies:", req.cookies.getAll());
+  console.log("access_token:", token);
 
   const requestingAuth = isAuthRoute(pathname);
   const requestingProtected = isProtectedRoute(pathname);
@@ -33,5 +38,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/dashboard/:path*"],
+  matcher: ["/", "/dashboard/:path*", "/test-log/:path*"],
 };

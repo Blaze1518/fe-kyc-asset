@@ -10,7 +10,7 @@ import { SidebarProvider, SidebarInset } from "@/shared/ui/sidebar";
 import { useGetAuthUser } from "@/modules/sign-in/presentation/hooks/use-sign-in";
 import { Loader2 } from "lucide-react";
 import { TextShimmerWave } from "@/shared/ui/animated-text-05";
-import { TransitionBox } from "@/shared/ui/box-transition";
+import TransitionBox from "@/shared/ui/box-transition";
 import { AbilityProvider } from "@/casl/provider";
 export default function DashboardLayout({
   children,
@@ -21,25 +21,27 @@ export default function DashboardLayout({
 
   const { data: meData, isLoading, isError } = useGetAuthUser();
 
-  useEffect(() => {
-    if (!isLoading && (isError || !meData?.data)) {
-      router.replace("/sign-in");
-    }
-  }, [isLoading, isError, meData, router]);
+  // useEffect(() => {
+  //   if (!isLoading && (isError || !meData?.data)) {
+  //     // router.replace("/sign-in");
+  //   }
+  // }, [isLoading, isError, meData, router]);
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <TextShimmerWave
-          duration={1}
-          spread={1}
-          zDistance={1}
-          scaleDistance={1.1}
-          rotateYDistance={20}
-          className="text-5xl font-sacramento"
-        >
-          KYC Assets for Attpay
-        </TextShimmerWave>
+        <TransitionBox variant="fade">
+          <TextShimmerWave
+            duration={1}
+            spread={1}
+            zDistance={1}
+            scaleDistance={1.1}
+            rotateYDistance={20}
+            className="text-7xl font-sacramento"
+          >
+            KYC Assets for Attpay
+          </TextShimmerWave>
+        </TransitionBox>
       </div>
     );
   }

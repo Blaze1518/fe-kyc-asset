@@ -19,6 +19,7 @@ export function attachInterceptors(instance: AxiosInstance) {
     (response) => response,
     async (error) => {
       const httpError = normalizeAxiosError(error);
+      console.log("httpError", httpError);
       const originalRequest = error.config;
 
       const errorCode = (httpError.data as any)?.errorCode;
@@ -27,15 +28,15 @@ export function attachInterceptors(instance: AxiosInstance) {
 
       if (
         httpError.status === 401 &&
-        errorCode === "TOKEN_EXPIRED" &&
+        errorCode === "AUTH_001" &&
         !originalRequest._retry
       ) {
         originalRequest._retry = true;
         try {
-          await axiosInstance.post("/auth/refresh-token");
+          await axiosInstance.post("/auth/refresh");
           return instance(originalRequest);
         } catch (refreshError) {
-          window.location.href = "/sign-in";
+          window.location.href = "/";
           return Promise.reject(normalizeAxiosError(refreshError));
         }
       }

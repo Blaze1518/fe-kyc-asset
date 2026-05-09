@@ -38,10 +38,6 @@ export function useGetAuthUser() {
   return useQuery<AuthUserResponse>({
     queryKey: ["auth-user"],
     queryFn: getAuthUserUseCase,
-    staleTime: 0,
-    gcTime: 0,
-    refetchOnWindowFocus: true,
-    placeholderData: undefined,
   });
 }
 
